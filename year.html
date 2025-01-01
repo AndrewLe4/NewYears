@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy New Year!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #1a1a40, #3333cc);
+            color: white;
+            text-align: center;
+            overflow: hidden;
+        }
+        header {
+            background-color: #ff9900;
+            color: white;
+            padding: 20px 0;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        .countdown {
+            font-size: 3rem;
+            margin: 50px 0;
+        }
+        .celebration {
+            font-size: 2rem;
+            margin: 20px 0;
+        }
+        #fireworks {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        footer {
+            background-color: #222;
+            color: #aaa;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        .test-button {
+            margin: 20px;
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            background-color: #ff9900;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .test-button:hover {
+            background-color: #cc7a00;
+        }
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: calc(100vh - 100px);
+        }
+    </style>
+    <script>
+        function updateCountdown() {
+            const newYear = new Date(new Date().getFullYear() + 1, 0, 1);
+            const now = new Date();
+            const diff = newYear - now;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            const countdownElement = document.getElementById('countdown');
+            countdownElement.innerText = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+            if (diff <= 0) {
+                clearInterval(timer);
+                document.querySelector('.countdown').innerHTML = "🎉 Happy New Year! 🎉";
+                document.getElementById('celebration').innerText = "🎉 Happy New Year! 🎉";
+                launchFireworks();
+            }
+        }
+
+        function launchFireworks() {
+            const canvas = document.getElementById('fireworks');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+
+            function createParticle(x, y, color) {
+                return {
+                    x,
+                    y,
+                    size: Math.random() * 5 + 2,
+                    color,
+                    velocityX: (Math.random() - 0.5) * 10,
+                    velocityY: Math.random() * -10 - 5,
+                    gravity: 0.2,
+                    lifespan: 100,
+                };
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                particles.forEach((particle, index) => {
+                    particle.x += particle.velocityX;
+                    particle.y += particle.velocityY;
+                    particle.velocityY += particle.gravity;
+                    particle.lifespan--;
+
+                    ctx.beginPath();
+                    ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                    ctx.fillStyle = particle.color;
+                    ctx.fill();
+
+                    if (particle.lifespan <= 0) {
+                        particles.splice(index, 1);
+                    }
+                });
+
+                requestAnimationFrame(animate);
+            }
+
+            setInterval(() => {
+                const colors = ["#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff"];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height / 2;
+                for (let i = 0; i < 30; i++) {
+                    particles.push(createParticle(x, y, color));
+                }
+            }, 500);
+
+            animate();
+        }
+
+        let timer;
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCountdown();
+            timer = setInterval(updateCountdown, 1000);
+
+            document.getElementById('testFireworks').addEventListener('click', launchFireworks);
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <h1>😂 New Year Celebration 😂</h1>
+    </header>
+    <main>
+        <div class="countdown">
+            Time left until New Year: <span id="countdown"></span>
+        </div>
+        <div id="celebration" class="celebration"></div>
+        <button id="testFireworks" class="test-button">Test Fireworks</button>
+    </main>
+    <canvas id="fireworks"></canvas>
+</body>
+</html>
